@@ -1,164 +1,3 @@
-
-//
-//  Itineraryview.swift
-//  TravelItinerary
-//
-//  Created by Chandan Munjal on 17/03/26.
-//
-
-//import SwiftUI
-//
-//struct ItineraryView: View {
-//    let itinerary: Itinerary
-//    let onReset: () -> Void
-//
-//    @State private var selectedDay = 0
-//
-//    var body: some View {
-//        ZStack {
-//            Color(red: 0.97, green: 0.97, blue: 0.95)
-//                .ignoresSafeArea()
-//
-//            VStack(spacing: 0) {
-//
-//                // Header
-//                VStack(alignment: .leading, spacing: 4) {
-//                    HStack {
-//                        VStack(alignment: .leading, spacing: 4) {
-//                            Text(itinerary.location)
-//                                .font(.system(size: 28, weight: .bold, design: .serif))
-//                                .foregroundColor(.black)
-//                            Text("\(itinerary.days.count)-Day Itinerary")
-//                                .font(.system(size: 14, weight: .medium))
-//                                .foregroundColor(.black.opacity(0.45))
-//                        }
-//                        Spacer()
-//                        Button {
-//                            onReset()
-//                        } label: {
-//                            Image(systemName: "arrow.left.circle.fill")
-//                                .font(.system(size: 28))
-//                                .foregroundColor(.black.opacity(0.15))
-//                        }
-//                    }
-//                }
-//                .padding(.horizontal, 24)
-//                .padding(.top, 8)
-//                .padding(.bottom, 16)
-//
-//                // Day Selector (horizontal scroll)
-//                ScrollView(.horizontal, showsIndicators: false) {
-//                    HStack(spacing: 8) {
-//                        ForEach(itinerary.days) { day in
-//                            Button {
-//                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-//                                    selectedDay = day.dayNumber - 1
-//                                }
-//                            } label: {
-//                                VStack(spacing: 3) {
-//                                    Text("DAY")
-//                                        .font(.system(size: 9, weight: .semibold))
-//                                        .kerning(1)
-//                                        .foregroundColor(selectedDay == day.dayNumber - 1 ? .white.opacity(0.7) : .black.opacity(0.35))
-//                                    Text("\(day.dayNumber)")
-//                                        .font(.system(size: 22, weight: .bold, design: .serif))
-//                                        .foregroundColor(selectedDay == day.dayNumber - 1 ? .white : .black)
-//                                }
-//                                .frame(width: 58, height: 64)
-//                                .background(selectedDay == day.dayNumber - 1 ? Color.black : Color.white)
-//                                .clipShape(RoundedRectangle(cornerRadius: 14))
-//                                .overlay(
-//                                    RoundedRectangle(cornerRadius: 14)
-//                                        .stroke(Color.black.opacity(0.08), lineWidth: 1)
-//                                )
-//                            }
-//                        }
-//                    }
-//                    .padding(.horizontal, 24)
-//                    .padding(.bottom, 16)
-//                }
-//
-//                // Activities
-//                ScrollView {
-//                    if selectedDay < itinerary.days.count {
-//                        let day = itinerary.days[selectedDay]
-//                        VStack(alignment: .leading, spacing: 0) {
-//
-//                            // Day title
-//                            Text(day.title)
-//                                .font(.system(size: 20, weight: .semibold, design: .serif))
-//                                .foregroundColor(.black)
-//                                .padding(.horizontal, 24)
-//                                .padding(.bottom, 16)
-//
-//                            // Activities list
-//                            ForEach(Array(day.activities.enumerated()), id: \.element.id) { index, activity in
-//                                ActivityCard(activity: activity, isLast: index == day.activities.count - 1)
-//                                    .padding(.horizontal, 24)
-//                            }
-//                        }
-//                        .padding(.bottom, 32)
-//                    }
-//                }
-//            }
-//        }
-//        .navigationBarHidden(true)
-//    }
-//}
-//
-//struct ActivityCard: View {
-//    let activity: Activity
-//    let isLast: Bool
-//
-//    var body: some View {
-//        HStack(alignment: .top, spacing: 16) {
-//
-//            // Timeline
-//            VStack(spacing: 0) {
-//                ZStack {
-//                    Circle()
-//                        .fill(Color.white)
-//                        .frame(width: 40, height: 40)
-//                        .overlay(Circle().stroke(Color.black.opacity(0.08), lineWidth: 1))
-//                    Text(activity.emoji)
-//                        .font(.system(size: 18))
-//                }
-//                if !isLast {
-//                    Rectangle()
-//                        .fill(Color.black.opacity(0.08))
-//                        .frame(width: 1)
-//                        .frame(maxHeight: .infinity)
-//                        .padding(.top, 4)
-//                }
-//            }
-//            .frame(width: 40)
-//
-//            // Content
-//            VStack(alignment: .leading, spacing: 6) {
-//                if !activity.time.isEmpty {
-//                    Text(activity.time)
-//                        .font(.system(size: 11, weight: .semibold))
-//                        .foregroundColor(.black.opacity(0.35))
-//                        .textCase(.uppercase)
-//                        .kerning(0.8)
-//                }
-//
-//                Text(activity.title)
-//                    .font(.system(size: 16, weight: .semibold))
-//                    .foregroundColor(.black)
-//
-//                Text(activity.description)
-//                    .font(.system(size: 14, weight: .regular))
-//                    .foregroundColor(.black.opacity(0.55))
-//                    .fixedSize(horizontal: false, vertical: true)
-//            }
-//            .padding(.bottom, isLast ? 0 : 24)
-//
-//            Spacer()
-//        }
-//    }
-//}
-
 import SwiftUI
 
 struct ItineraryView: View {
@@ -205,7 +44,9 @@ struct ItineraryView: View {
                 .padding(.top, 12)
                 .padding(.bottom, 16)
 
-                // ── Day Pill Strip ────────────────────────────────────────
+                // ── Day Pill Strip ─────────────────────────────────────────
+                // Key fix: give the ScrollView a fixed height and use
+                // GeometryReader-free layout so it doesn't collapse
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 7) {
                         ForEach(itinerary.days) { day in
@@ -240,7 +81,9 @@ struct ItineraryView: View {
                     .padding(.horizontal, 24)
                     .padding(.vertical, 6)
                 }
-                .padding(.bottom, 4)
+                // Fixed height stops the ScrollView collapsing and
+                // prevents the vertical parent from stealing the gesture
+                .frame(height: 78)
 
                 // Thin separator
                 Rectangle()
@@ -249,13 +92,12 @@ struct ItineraryView: View {
                     .padding(.horizontal, 24)
                     .padding(.bottom, 4)
 
-                // ── Activities ────────────────────────────────────────────
+                // ── Activities (vertical scroll) ───────────────────────────
                 ScrollView(.vertical, showsIndicators: false) {
                     if selectedDay < itinerary.days.count {
                         let day = itinerary.days[selectedDay]
                         VStack(alignment: .leading, spacing: 0) {
 
-                            // Day title + mini description
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(day.title)
                                     .font(.system(size: 22, weight: .bold, design: .serif))
@@ -269,7 +111,6 @@ struct ItineraryView: View {
                             .padding(.top, 16)
                             .padding(.bottom, 20)
 
-                            // Activity cards
                             ForEach(Array(day.activities.enumerated()), id: \.element.id) { index, activity in
                                 ActivityCard(
                                     activity: activity,
@@ -297,13 +138,12 @@ struct ActivityCard: View {
     let index: Int
     let isLast: Bool
 
-    // Subtle accent colors cycling through stops
     private var accentColor: Color {
         let palette: [Color] = [
-            Color(red: 0.95, green: 0.90, blue: 0.80),   // warm sand
-            Color(red: 0.88, green: 0.93, blue: 0.88),   // soft sage
-            Color(red: 0.88, green: 0.90, blue: 0.96),   // soft sky
-            Color(red: 0.95, green: 0.88, blue: 0.92),   // soft rose
+            Color(red: 0.95, green: 0.90, blue: 0.80),
+            Color(red: 0.88, green: 0.93, blue: 0.88),
+            Color(red: 0.88, green: 0.90, blue: 0.96),
+            Color(red: 0.95, green: 0.88, blue: 0.92),
         ]
         return palette[index % palette.count]
     }
@@ -311,7 +151,7 @@ struct ActivityCard: View {
     var body: some View {
         HStack(alignment: .top, spacing: 14) {
 
-            // ── Timeline column ──────────────────────────────────────
+            // Timeline column
             VStack(spacing: 0) {
                 ZStack {
                     Circle()
@@ -320,7 +160,6 @@ struct ActivityCard: View {
                     Text(activity.emoji)
                         .font(.system(size: 19))
                 }
-
                 if !isLast {
                     Rectangle()
                         .fill(
@@ -336,7 +175,7 @@ struct ActivityCard: View {
             }
             .frame(width: 42)
 
-            // ── Text content ─────────────────────────────────────────
+            // Text content
             VStack(alignment: .leading, spacing: 5) {
                 if !activity.time.isEmpty {
                     Text(activity.time)
@@ -350,7 +189,7 @@ struct ActivityCard: View {
                     .foregroundColor(.black)
                     .fixedSize(horizontal: false, vertical: true)
                 Text(activity.description)
-                    .font(.system(size: 13, weight: .regular))
+                    .font(.system(size: 13))
                     .foregroundColor(.black.opacity(0.5))
                     .fixedSize(horizontal: false, vertical: true)
                     .lineSpacing(2)

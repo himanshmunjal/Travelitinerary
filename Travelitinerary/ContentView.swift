@@ -1,6 +1,5 @@
 import SwiftUI
 
-// MARK: - Popular Destination Model
 struct PopularDestination: Identifiable {
     let id = UUID()
     let name: String
@@ -39,10 +38,11 @@ struct ContentView: View {
                 Color(red: 0.97, green: 0.97, blue: 0.95)
                     .ignoresSafeArea()
 
-                ScrollView(showsIndicators: false) {
+                // Outer scroll is VERTICAL only — no horizontal content inside it
+                ScrollView(.vertical, showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 28) {
 
-                        // ── Header ──────────────────────────────────────
+                        // ── Header ───────────────────────────────────────
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Plan Your")
                                 .font(.system(size: 34, weight: .light, design: .serif))
@@ -53,20 +53,18 @@ struct ContentView: View {
                         }
                         .padding(.top, 20)
 
-                        // ── Location Input ───────────────────────────────
-                        VStack(alignment: .leading, spacing: 10) {
+                        // ── Location Input ────────────────────────────────
+                        VStack(alignment: .leading, spacing: 12) {
                             SectionLabel(icon: "mappin.circle.fill", title: "Where to?")
 
                             HStack(spacing: 10) {
                                 Image(systemName: "magnifyingglass")
                                     .foregroundColor(.black.opacity(0.3))
                                     .font(.system(size: 15, weight: .medium))
-
                                 TextField("City, region or country...", text: $locationText)
                                     .font(.system(size: 16))
                                     .autocorrectionDisabled()
                                     .submitLabel(.done)
-
                                 if !locationText.isEmpty {
                                     Button { locationText = "" } label: {
                                         Image(systemName: "xmark.circle.fill")
@@ -81,7 +79,7 @@ struct ContentView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                             .shadow(color: .black.opacity(0.04), radius: 8, x: 0, y: 2)
 
-                            // ── Popular Destinations ─────────────────────
+                            // ── Popular destinations ──────────────────────
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("POPULAR")
                                     .font(.system(size: 10, weight: .semibold))
@@ -89,9 +87,12 @@ struct ContentView: View {
                                     .foregroundColor(.black.opacity(0.3))
                                     .padding(.leading, 2)
 
+                                // Key fix: fixed height on the horizontal ScrollView
+                                // so it doesn't get swallowed by the outer vertical ScrollView
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack(spacing: 8) {
                                         ForEach(popularDestinations) { dest in
+                                            let isActive = locationText == dest.name
                                             Button {
                                                 withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                                     locationText = dest.name
@@ -103,24 +104,15 @@ struct ContentView: View {
                                                         .font(.system(size: 14))
                                                     Text(dest.name)
                                                         .font(.system(size: 13, weight: .medium))
-                                                        .foregroundColor(locationText == dest.name
-                                                            ? .white
-                                                            : Color(red: 0.2, green: 0.2, blue: 0.2))
+                                                        .foregroundColor(isActive ? .white : Color(red: 0.2, green: 0.2, blue: 0.2))
                                                 }
-                                                .padding(.horizontal, 12)
-                                                .padding(.vertical, 8)
-                                                .background(
-                                                    locationText == dest.name
-                                                        ? Color.black
-                                                        : Color.white
-                                                )
+                                                .padding(.horizontal, 13)
+                                                .padding(.vertical, 9)
+                                                .background(isActive ? Color.black : Color.white)
                                                 .clipShape(Capsule())
                                                 .shadow(
-                                                    color: locationText == dest.name
-                                                        ? .black.opacity(0.18)
-                                                        : .black.opacity(0.05),
-                                                    radius: locationText == dest.name ? 6 : 3,
-                                                    x: 0, y: 2
+                                                    color: isActive ? .black.opacity(0.18) : .black.opacity(0.06),
+                                                    radius: isActive ? 6 : 3, x: 0, y: 2
                                                 )
                                             }
                                             .buttonStyle(.plain)
@@ -130,10 +122,13 @@ struct ContentView: View {
                                     .padding(.vertical, 4)
                                     .padding(.horizontal, 2)
                                 }
+                                // Fixed height is the critical fix — without this the outer
+                                // ScrollView absorbs all gestures and kills horizontal scrolling
+                                .frame(height: 44)
                             }
                         }
 
-                        // ── Exploration Radius ───────────────────────────
+                        // ── Exploration Radius ────────────────────────────
                         VStack(alignment: .leading, spacing: 12) {
                             HStack {
                                 SectionLabel(icon: "circle.dashed", title: "Radius")
@@ -145,7 +140,9 @@ struct ContentView: View {
 
                             HStack(spacing: 6) {
                                 ForEach(radiusOptions, id: \.self) { option in
-                                    Button { withAnimation(.spring(response: 0.2)) { radiusKm = option } } label: {
+                                    Button {
+                                        withAnimation(.spring(response: 0.2)) { radiusKm = option }
+                                    } label: {
                                         Text("\(option)")
                                             .font(.system(size: 14, weight: radiusKm == option ? .bold : .regular))
                                             .foregroundColor(radiusKm == option ? .white : .black.opacity(0.6))
@@ -163,27 +160,28 @@ struct ContentView: View {
                                 }
                             }
 
-                            // Visual radius hint
-                            HStack(spacing: 0) {
-                                ForEach(radiusOptions, id: \.self) { option in
-                                    Rectangle()
-                                        .fill(option <= radiusKm ? Color.black : Color.black.opacity(0.1))
-                                        .frame(height: 2)
-                                        .animation(.easeInOut(duration: 0.2), value: radiusKm)
-                                    if option != radiusOptions.last {
-                                        Spacer()
-                                    }
+                            // Progress bar hint
+                            GeometryReader { geo in
+                                ZStack(alignment: .leading) {
+                                    Capsule()
+                                        .fill(Color.black.opacity(0.07))
+                                        .frame(height: 3)
+                                    let idx = radiusOptions.firstIndex(of: radiusKm) ?? 0
+                                    let fraction = CGFloat(idx + 1) / CGFloat(radiusOptions.count)
+                                    Capsule()
+                                        .fill(Color.black.opacity(0.5))
+                                        .frame(width: geo.size.width * fraction, height: 3)
+                                        .animation(.spring(response: 0.3), value: radiusKm)
                                 }
                             }
-                            .padding(.horizontal, 2)
+                            .frame(height: 3)
                         }
 
-                        // ── Number of Days ───────────────────────────────
+                        // ── Number of Days ────────────────────────────────
                         VStack(alignment: .leading, spacing: 12) {
                             SectionLabel(icon: "calendar", title: "Duration")
 
                             HStack(alignment: .center, spacing: 0) {
-                                // Minus
                                 Button {
                                     if numberOfDays > 1 {
                                         withAnimation(.spring(response: 0.2)) { numberOfDays -= 1 }
@@ -198,7 +196,6 @@ struct ContentView: View {
 
                                 Spacer()
 
-                                // Day count display
                                 VStack(spacing: 0) {
                                     Text("\(numberOfDays)")
                                         .font(.system(size: 44, weight: .bold, design: .serif))
@@ -213,7 +210,6 @@ struct ContentView: View {
 
                                 Spacer()
 
-                                // Plus
                                 Button {
                                     if numberOfDays < 14 {
                                         withAnimation(.spring(response: 0.2)) { numberOfDays += 1 }
@@ -235,7 +231,7 @@ struct ContentView: View {
                             .shadow(color: .black.opacity(0.04), radius: 8, x: 0, y: 2)
                         }
 
-                        // ── Error Banner ─────────────────────────────────
+                        // ── Error Banner ──────────────────────────────────
                         if let error = viewModel.errorMessage {
                             HStack(spacing: 10) {
                                 Image(systemName: "exclamationmark.triangle.fill")
@@ -253,7 +249,7 @@ struct ContentView: View {
                             .transition(.move(edge: .top).combined(with: .opacity))
                         }
 
-                        // ── Generate Button ──────────────────────────────
+                        // ── Generate Button ───────────────────────────────
                         Button {
                             Task {
                                 await viewModel.generateItinerary(
@@ -283,14 +279,9 @@ struct ContentView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 18)
-                            .background(
-                                canGenerate
-                                    ? Color.black
-                                    : Color.black.opacity(0.2)
-                            )
+                            .background(canGenerate ? Color.black : Color.black.opacity(0.2))
                             .clipShape(RoundedRectangle(cornerRadius: 16))
-                            .shadow(color: canGenerate ? .black.opacity(0.25) : .clear,
-                                    radius: 12, x: 0, y: 4)
+                            .shadow(color: canGenerate ? .black.opacity(0.25) : .clear, radius: 12, x: 0, y: 4)
                             .animation(.easeInOut(duration: 0.2), value: canGenerate)
                         }
                         .disabled(!canGenerate)
@@ -311,11 +302,10 @@ struct ContentView: View {
     }
 }
 
-// MARK: - Reusable Section Label
+// MARK: - Section Label
 struct SectionLabel: View {
     let icon: String
     let title: String
-
     var body: some View {
         Label(title, systemImage: icon)
             .font(.system(size: 12, weight: .semibold))
@@ -324,7 +314,6 @@ struct SectionLabel: View {
             .kerning(1.0)
     }
 }
-
 #Preview{
     ContentView()
 }
