@@ -1,14 +1,14 @@
 # 🌍 AI Travel Itinerary App (SwiftUI + Gemini API)
 
-An intelligent, beautifully designed iOS application that generates **personalized travel itineraries** using AI.
+An intelligent iOS application that generates **personalized travel itineraries** using AI.
 
-Built with **SwiftUI** and powered by **Gemini API**, this app creates dynamic, non-repetitive, and human-like travel plans in seconds.
+Built with **SwiftUI** and powered by the **Gemini API (Google AI)**, this app creates dynamic, non-repetitive, and human-like travel plans in seconds.
 
 ---
 
 ## ✨ Features
 
-* 🧠 AI-generated itineraries (multi-day trips)
+* 🧠 AI-generated itineraries using Gemini API
 * 📍 Location-based planning (radius-based filtering)
 * 🎯 Smart, non-repetitive activity generation
 * 🕒 Dynamic time allocation (no rigid schedules)
@@ -20,19 +20,19 @@ Built with **SwiftUI** and powered by **Gemini API**, this app creates dynamic, 
 
 ## 🎥 Demo
 
-I’ve attached a **demo video** showing the full working of the app — from generating itineraries to exploring daily plans.
+I’ve attached a **demo video** showcasing the complete working of the app — from generating itineraries using Gemini API to exploring daily plans.
 
 ---
 
 ## 🚀 Motivation
 
-The curiosity of **“how apps like travel planners actually work”** pushed me to build this.
+The curiosity of **“how apps are actually built and how AI powers them”** pushed me to create this project.
 
 Instead of just using apps, I wanted to understand:
 
-* How AI generates real-world useful content
-* How UI + backend logic come together
-* How to make something **practical, beautiful, and scalable**
+* How Gemini API generates real-world useful content
+* How frontend (SwiftUI) interacts with AI systems
+* How to build something **practical, scalable, and impactful**
 
 This project is a result of that curiosity.
 
@@ -41,7 +41,7 @@ This project is a result of that curiosity.
 ## 🛠 Tech Stack
 
 * **Frontend:** SwiftUI
-* **AI Integration:** Gemini API
+* **AI Integration:** Gemini API (Google AI)
 * **Architecture:** Clean + Modular
 * **Design:** Minimalist & modern
 
@@ -49,10 +49,10 @@ This project is a result of that curiosity.
 
 ## 💡 Key Learnings
 
-* Prompt engineering for structured yet creative outputs
-* Balancing flexibility vs parseable data
-* Designing scalable UI components in SwiftUI
-* Handling AI response inconsistencies
+* Prompt engineering with Gemini API
+* Balancing flexibility vs structured AI output
+* Designing scalable UI in SwiftUI
+* Handling real-world AI response inconsistencies
 
 ---
 
@@ -67,8 +67,8 @@ This project is a result of that curiosity.
 * User preferences (budget, interests, travel style)
 * Map integration
 * Offline itinerary saving
-* Sharing plans with friends
-* AI personalization
+* Sharing itineraries
+* Deeper AI personalization using Gemini
 
 ---
 
@@ -80,7 +80,7 @@ Give it a star ⭐ and feel free to contribute!
 
 ## 🙌 Final Note
 
-This started as curiosity…
-Now it feels like the beginning of something much bigger.
+Started with curiosity…
+Now building with purpose 🚀
 
 ---
