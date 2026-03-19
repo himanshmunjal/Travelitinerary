@@ -204,74 +204,100 @@ class GeminiService {
     // MARK: - Prompt Builder
 
     private func buildPrompt(location: String, radiusKm: Int, days: Int) -> String {
-        // Token budget: ~120 tokens per day (4 activities × ~30 tokens each)
-        // Keep descriptions to one short sentence to stay well under budget
         return """
-        Write a \(days)-day travel itinerary for \(location), covering places within \(radiusKm) km.
+        You are an expert travel planner creating a fun, human-like, and non-repetitive itinerary.
 
-        CRITICAL: You must output ALL \(days) days — DAY 1 through DAY \(days). Do not stop early.
+        Create a \(days)-day itinerary for \(location), within \(radiusKm) km.
 
-        Use this exact format for every single day:
+        IMPORTANT:
+        - Generate ALL days from DAY 1 to DAY \(days)
+        - Each day must feel different in structure, pacing, and vibe
+        - Avoid any fixed or repeating patterns
 
-        DAY 1: [Short Title]
-        9:00 AM | 🏛 [Place Name] | One sentence, max 12 words.
-        12:30 PM | 🍽 [Restaurant Name] | One sentence, max 12 words.
-        3:00 PM | 🎨 [Activity Name] | One sentence, max 12 words.
-        7:00 PM | 🌆 [Evening Activity] | One sentence, max 12 words.
+        STRUCTURE:
+        - Each day must include EXACTLY 4 activities
+        - Each activity must include:
+            • A realistic time (but NOT fixed or repeated across days)
+            • A place name
+            • A short, vivid description (max 12 words)
 
-        DAY 2: [Short Title]
-        ...and so on until DAY \(days).
+        TIME RULES:
+        - Do NOT use the same time slots every day
+        - Vary timings naturally (early morning, late morning, afternoon, evening, night)
+        - Times should feel human and realistic, not evenly spaced
 
-        Rules:
-        - Exactly 4 activities per day
-        - Descriptions: one sentence, max 12 words each
-        - Real places within \(radiusKm) km of \(location)
-        - No intro, no summary, no extra text — only the itinerary
+        EXPERIENCE RULES:
+        - Mix activity types: food, culture, nature, markets, hidden gems, nightlife
+        - Some days can be relaxed, others packed
+        - Avoid repeating the same sequence of activities each day
 
-        Start with DAY 1 and end with DAY \(days):
+        STYLE:
+        - Write like a real travel planner, not a template
+        - Make it lively, slightly adventurous, and engaging
+        - Include unique/local experiences, not just tourist spots
+
+        FORMAT:
+
+        DAY 1: [Catchy title]
+
+        Time | Emoji | Place Name | Description
+
+        DAY 2: [Different title]
+
+        (continue similarly...)
+
+        RULES:
+        - Use only real places within \(radiusKm) km of \(location)
+        - No intro, no summary, only itinerary
+        - Do NOT follow identical structure across days
+
+        FINAL CHECK:
+        If the itinerary looks repetitive or templated, rewrite it with more variation.
+
+        Start from DAY 1 and end at DAY \(days)
         """
     }
-
+    
     private func buildRetryPrompt(existing: String, location: String, radiusKm: Int, from: Int, to: Int) -> String {
         return """
-    You are a smart travel planner creating a detailed, realistic itinerary.
+        You are continuing a travel itinerary in a natural, engaging way.
 
-    Context:
-    - Destination: \(location)
-    - Continue from: Day \(from) to Day \(to)
-    - Previous itinerary already exists up to Day \(from - 1)
+        Context:
+        - Location: \(location)
+        - Continue from Day \(from) to Day \(to)
+        - Previous days already exist
 
-    Your task:
-    Continue the itinerary smoothly without repeating previous places or activities.
-    Ensure continuity in experience, variety, and logical flow.
+        Your goal:
+        Extend the itinerary WITHOUT repetition and with increasing variety.
 
-    Guidelines:
-    - Include only real and well-known places within \(radiusKm) km of \(location)
-    - Keep travel practical (group nearby places together)
-    - Balance sightseeing, food, relaxation, and unique experiences
-    - Avoid repeating locations already likely covered
-    - Keep descriptions concise but engaging (1 line each)
-    - Make each day feel unique (no template repetition)
+        GUIDELINES:
+        - Use only real places within \(radiusKm) km
+        - Do NOT repeat places or similar experiences
+        - Keep a natural travel flow (group nearby places)
+        - Mix experiences: culture, food, nature, markets, relaxation, nightlife
+        - Vary time slots and avoid fixed schedules
+        - Each day should feel different in vibe (exploration, chill, luxury, local life)
 
-    Format (flexible but consistent):
-    DAY N: [Theme or Short Title]
-    - Time | Activity Type Emoji | Place Name | Short engaging description
+        STYLE:
+        - Human-like, not templated
+        - Slight variation in formatting is allowed but keep it clean
+        - Descriptions: short, vivid, max 12 words
 
-    Example structure (do NOT copy exactly, vary naturally):
-    DAY 3: Cultural Exploration
-    - 9:00 AM | 🏛 | Museum Name | Explore historical artifacts and local heritage
-    - 1:00 PM | 🍽 | Restaurant Name | Enjoy authentic regional cuisine
-    - 4:00 PM | 🎨 | Local Market | Discover art, crafts, and street culture
-    - 7:30 PM | 🌆 | Scenic Spot | Relax with evening views
+        FORMAT:
 
-    Important:
-    - Do NOT repeat the exact same timing or structure every day
-    - Slightly vary time slots and activity types
-    - Maintain a natural, human-like travel flow
+        DAY \(from): [Unique title]
 
-    Start directly from:
-    DAY \(from)
-    """
+        Time | Emoji | Place | Description
+
+        Continue until DAY \(to)
+
+        IMPORTANT:
+        - No repetition of structure or timing patterns
+        - Keep it engaging and realistic
+        - No intro or conclusion
+
+        Start from DAY \(from)
+        """
     }
 
     // MARK: - API Call
